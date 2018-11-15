@@ -37,6 +37,7 @@ public class Polynom implements Polynom_able{
 	
 	/**
 	 * a constructor that creates a Polynom based on a String
+	 * the constructor will throw a NumberFormatException when a polynom is written incorrectly.
 	 * @param p1
 	 */
 	public Polynom(String p1){
@@ -462,7 +463,7 @@ public class Polynom implements Polynom_able{
 	
 	
 	/**
-	 * the method creates a 2D graph for this Polynom,
+	 * the method creates a 2D graph for this Polynom, using XChart library
 	 * and also mark its Maxima and Minima between the bounds x0 and x1
 	 * @param x0
 	 * @param x1
