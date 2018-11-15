@@ -69,7 +69,6 @@ public class Test {
 		Polynom p2=new Polynom("2.3*X^5+0+4x^7-5.1x^3-1.98^15");
 		Polynom_able p3=new Polynom();
 		
-		System.out.println(p1.equals(p2));
 		
 		System.out.println("p1= "+p1);
 		System.out.println("p2= "+p2);
