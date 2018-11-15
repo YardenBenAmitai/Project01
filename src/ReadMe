@@ -1,0 +1,38 @@
+readme:
+name: Yarden Ben Amitai the project was programmed on Eclipse Java Neon.
+
+myMath is comprised of two leading classes: Monom and Polynom; 
+one Monom_Comperator class (that implements Comparator) 
+and three interfaces: function, cont_function (that extends function) and Polynom_able (that extends cont_function).
+
+Monom:
+Monom class has two fields: coefficient and power.
+Monom class can perform derivative, multiply and addition.
+the class also implements function interface and therefore contains one more method,
+area, which upon receiving a number will calculate the value of the Monom at the given number.
+the class has two constructors, one that receives the two fields and one that receives a Monom and copy its fields.
+
+Polynom:
+Polynom class has only one field, an ArrayList comprised of Monoms.
+Polynom class implements the Polynom_able interface and therefore performs the methods:
+addition of two Polynoms or a Polynom with a Monom, subtraction of a Polynom, multiplication of two Polynoms,
+testing if two Polynoms are equal, testing if a Polynom is zero, calculation of root using the bisection method,
+creation of a deep copy to a Polynom, derivative and creation of an iterator.
+the Polynom_able interface extends cont_function interface and therefore contains a method of calculation of Riamann's Integral,
+and also a method from function interface that calculates the value of the Polynom in a given number.
+the class has two constructors, one creates an empty Polynom and the other receives a string of a polynomial and turns it into a Polynom object.
+
+myMath contains an additional library, XCHart.
+with XChart, Polynom now contains the method PGraph that present the user a chart showing the polynomial along with its local Maxima and Minima.
+Polynom now also contains a method for finding the area below the xAxis and above the Polynom.
+
+both Monom and Polynom contains the method toString.
+
+
+in my work, i mostly made use of google and Wikipedia.
+i downloaded XChart jar file from https://knowm.org/open-source/xchart/
+and have made use of the notes https://knowm.org/javadocs/xchart/index.html
+
+*additional notes:
+-I've encountered a slight inaccuracy when trying to subtract two Monoms,
+the problem could have been resolved by using BigDecimal variables,but as coefficient is set as double, i decided to leave it unchanged.

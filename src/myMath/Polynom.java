@@ -49,30 +49,36 @@ public class Polynom implements Polynom_able{
 		
 		while (i<p1.length())
 		{
-			while ((i<p1.length())&&(p1.charAt(i)!='*')&&(p1.charAt(i)!='x')&&(p1.charAt(i)!='X')&&(p1.charAt(i)!='+')&&(p1.charAt(i)!='-')){
+			while ((i<p1.length())&&(p1.charAt(i)!='*')&&(p1.charAt(i)!='x')&&(p1.charAt(i)!='X')){
+				if (((coefficient.contains("+"))||(coefficient.contains("-")))&&((p1.charAt(i)=='+')||(p1.charAt(i)=='-')))
+					break;
 				coefficient+=p1.charAt(i);
 				i++;
 			}
-			if (coefficient==""){
+			
+			if ((coefficient=="")&&((p1.charAt(i)=='*')||(p1.charAt(i)=='x')||(p1.charAt(i)=='X'))){
 				coefficient="1";
 			}
-			while ((i<p1.length())&&(p1.charAt(i)!='^')){
+			
+			
+			while ((i<p1.length())&&(p1.charAt(i-1)!='^')&&((p1.charAt(i)!='+')&&(p1.charAt(i)!='-'))){
 				i++;
 			}
-			i++;
+			
 			while ((i<p1.length())&&(p1.charAt(i)!='+')&&(p1.charAt(i)!='-')){
 				power+=p1.charAt(i);
 				i++;
 			}
 			
-			
-			try {
-				Monom m=new Monom(Double.parseDouble(coefficient), Integer.parseInt(power));
-				str_poly.add(m);
-			}
-			catch(NumberFormatException e){
-				System.err.println("Caught NumberFormatException: "
-                        +  e.getMessage());
+			if(coefficient!=""){
+				try {
+					Monom m=new Monom(Double.parseDouble(coefficient), Integer.parseInt(power));
+					str_poly.add(m);
+				}
+				catch(NumberFormatException e){
+					System.err.println("Caught NumberFormatException: "
+	                        +  e.getMessage());
+				}
 			}
 			
 			coefficient="";
@@ -424,7 +430,7 @@ public class Polynom implements Polynom_able{
 		{
 			if (((this.f(i)>this.f(i-0.01))&&(this.f(i)>this.f(i+0.01)))||((this.f(i)<this.f(i-0.01))&&(this.f(i)<this.f(i+0.01))))
 			{
-				if((p.f(i)<0.01)&&(p.f(i)>-0.01)){
+				if((p.f(i)<0.001)&&(p.f(i)>-0.001)){
 					arr.add(i);
 					arr.add(f(i));
 				}
@@ -496,7 +502,7 @@ public class Polynom implements Polynom_able{
 	/**
 	 * remove all zero-Monoms from this Polynom
 	 */
-	private void removeZero(){
+	public void removeZero(){
 		
 		int counter=-1;
 		Iterator<Monom> it=this.poly.iterator();
