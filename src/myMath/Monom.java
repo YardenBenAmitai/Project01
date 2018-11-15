@@ -108,6 +108,9 @@ public class Monom implements function{
 		return(this._coefficient*Math.pow(x,this._power));
 	}
 	
+	/**
+	 * the method returns a string of Monom
+	 */
 	public String toString(){
 		String str=String.valueOf(this._coefficient)+"x^"+String.valueOf(this._power);
 		return str;

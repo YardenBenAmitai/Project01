@@ -1,7 +1,14 @@
 package myMath;
 
 import java.util.ArrayList;
+
 import java.util.Iterator;
+
+import org.knowm.xchart.QuickChart;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYSeries;
+
 
 import myMath.Monom;
 /**
@@ -42,11 +49,13 @@ public class Polynom implements Polynom_able{
 		
 		while (i<p1.length())
 		{
-			while ((i<p1.length())&&(p1.charAt(i)!='*')&&(p1.charAt(i)!='x')&&(p1.charAt(i)!='X')){
+			while ((i<p1.length())&&(p1.charAt(i)!='*')&&(p1.charAt(i)!='x')&&(p1.charAt(i)!='X')&&(p1.charAt(i)!='+')&&(p1.charAt(i)!='-')){
 				coefficient+=p1.charAt(i);
 				i++;
 			}
-			
+			if (coefficient==""){
+				coefficient="1";
+			}
 			while ((i<p1.length())&&(p1.charAt(i)!='^')){
 				i++;
 			}
@@ -55,8 +64,17 @@ public class Polynom implements Polynom_able{
 				power+=p1.charAt(i);
 				i++;
 			}
-			Monom m=new Monom(Double.parseDouble(coefficient), Integer.parseInt(power));
-			str_poly.add(m);
+			
+			
+			try {
+				Monom m=new Monom(Double.parseDouble(coefficient), Integer.parseInt(power));
+				str_poly.add(m);
+			}
+			catch(NumberFormatException e){
+				System.err.println("Caught NumberFormatException: "
+                        +  e.getMessage());
+			}
+			
 			coefficient="";
 			power="";
 		}
@@ -163,24 +181,7 @@ public class Polynom implements Polynom_able{
 		this.removeZero();
 	}
 	
-	/**
-	 * remove all zero-Monoms from this Polynom
-	 */
-	public void removeZero(){
-		
-		int counter=-1;
-		Iterator<Monom> it=this.poly.iterator();
-		
-		while(it.hasNext())
-		{
-			counter++;
-			if(it.next().get_coefficient()==0)
-			{
-				this.poly.remove(counter);
-				counter--;
-			}
-		}
-	}
+	
 	
 	/**
 	 * Multiply this Polynom by p1
@@ -218,16 +219,22 @@ public class Polynom implements Polynom_able{
 	 */
 	public boolean equals (Polynom_able p1){
 		
-		this.removeZero();
 		Iterator <Monom> it_poly=this.poly.iterator();
 		Iterator <Monom> it_p1=p1.iteretor();
+		Monom m1;
+		Monom m2;
 		
 		while ((it_poly.hasNext())&&(it_p1.hasNext()))
 		{
-			if (it_poly.next()!=it_p1.next())
+			m1=it_poly.next();
+			m2=it_p1.next();
+			if ((m1.get_coefficient()!=m2.get_coefficient())||(m1.get_power()!=m2.get_power())){
+				
 				return false;
+			}
+			
 		}
-		if(it_poly.hasNext()==it_p1.hasNext()){
+		if((!it_poly.hasNext())&&(!it_p1.hasNext())){
 			return true;
 		}
 		return false;
@@ -335,7 +342,9 @@ public class Polynom implements Polynom_able{
 		
 		for (int i=1; i<rectangles;i++)
 		{
-			rmn+=this.f(x0+i*eps);
+			if (this.f(x0+i*eps)>=0){
+				rmn+=this.f(x0+(i*eps));
+			}
 		}
 		return rmn*eps;
 	}
@@ -373,7 +382,9 @@ public class Polynom implements Polynom_able{
 	}
 	
 	
-	
+	/**
+	 * return a string of this Polynom
+	 */
 	public String toString(){
 		
 		Iterator <Monom> it_poly=this.poly.iterator();
@@ -391,4 +402,113 @@ public class Polynom implements Polynom_able{
 		return str;
 	}
 	
+	
+	//--------------------------------------------------------------//
+	//--------------------------------------------------------------//
+	
+	
+	
+	/**
+	 * the method finds Maxima and Minima values between the bounds x0 and x1
+	 * the method searches for f(x) that is higher/lower than both its neighbors with eps of 0.01
+	 * @param x0
+	 * @param x1
+	 * @return array[double] where [x,y] are inserted accordingly.
+	 */
+	public ArrayList<Double> MaximaMinima(double x0, double x1){
+		
+		Polynom_able p=this.derivative();
+		ArrayList<Double> arr=new ArrayList<Double>();
+		
+		for (double i=x0; i<=x1; i=i+0.01)
+		{
+			if (((this.f(i)>this.f(i-0.01))&&(this.f(i)>this.f(i+0.01)))||((this.f(i)<this.f(i-0.01))&&(this.f(i)<this.f(i+0.01))))
+			{
+				if((p.f(i)<0.01)&&(p.f(i)>-0.01)){
+					arr.add(i);
+					arr.add(f(i));
+				}
+			}
+			
+		}
+		return arr;
+	}
+	
+	
+	/**
+	 * the method calculates the area above this polynom and below xAxis
+	 * @param x0
+	 * @param x1
+	 * @return Riemann's sum for the area below xAxis
+	 */
+	public double areaBelowX(double x0, double x1){
+		
+		double rmn=0;
+		
+		for (double i=x0; i<=x1; i=i+0.01)
+		{
+			if (this.f(i)<0){
+				rmn+=this.f(i);
+			}
+		}
+		return rmn*0.01*-1;
+	}
+	
+	
+	/**
+	 * the method creates a 2D graph for this Polynom,
+	 * and also mark its Maxima and Minima between the bounds x0 and x1
+	 * @param x0
+	 * @param x1
+	 */
+	public void PGraph(double x0, double x1){
+		
+		ArrayList<Double> xData = new ArrayList<Double>();
+	    ArrayList<Double> yData = new ArrayList<Double>();
+	    
+	    for (double i=x0; i<=x1; i=i+0.01){
+	    	xData.add(i);
+	    	yData.add(this.f(i));
+	    }
+	    
+	    // Create Chart
+	    XYChart chart = QuickChart.getChart(this.toString(), "X", "Y","y(x)", xData, yData);
+	    
+	    //getting Max/Min from this Polynom
+	    ArrayList<Double> arr=new ArrayList<Double>();
+	    arr=this.MaximaMinima(x0, x1);
+	    xData=new ArrayList<Double>();
+	    yData=new ArrayList<Double>();
+	    
+	    for (int i=0; i<arr.size(); i+=2){
+	    	xData.add(arr.get(i));
+	    	yData.add(arr.get(i+1));
+	    }
+	    
+	    //creating an additional Series for Max/Min, adding it to chart as scattered dots
+	    chart.addSeries("Maxima/Minima",xData, yData).setXYSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Scatter);
+	 
+	    // Show it
+	    new SwingWrapper(chart).displayChart();
+	}
+	
+	
+	/**
+	 * remove all zero-Monoms from this Polynom
+	 */
+	private void removeZero(){
+		
+		int counter=-1;
+		Iterator<Monom> it=this.poly.iterator();
+		
+		while(it.hasNext())
+		{
+			counter++;
+			if(it.next().get_coefficient()==0)
+			{
+				this.poly.remove(counter);
+				counter--;
+			}
+		}
+	}
 }
